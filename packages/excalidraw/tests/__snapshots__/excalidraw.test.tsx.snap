@@ -602,6 +602,72 @@ exports[`<Excalidraw/> > Test UIOptions prop > Test canvasActions > should rende
         Shift+Alt+D
       </div>
     </button>
+    <button
+      aria-label="Toggle rulers"
+      class="dropdown-menu-item dropdown-menu-item-base"
+      data-testid="toggle-rulers"
+      title="Toggle rulers"
+    >
+      <div
+        class="dropdown-menu-item__icon"
+      >
+        <svg
+          aria-hidden="true"
+          class=""
+          fill="none"
+          focusable="false"
+          role="img"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          viewBox="0 0 24 24"
+        >
+          <g
+            stroke-width="1.5"
+          >
+            <path
+              d="M0 0h24v24H0z"
+              fill="none"
+              stroke="none"
+            />
+            <path
+              d="M3 4h18v16H3z"
+            />
+            <path
+              d="M7 4v2"
+            />
+            <path
+              d="M11 4v3"
+            />
+            <path
+              d="M15 4v2"
+            />
+            <path
+              d="M19 4v3"
+            />
+            <path
+              d="M3 8h2"
+            />
+            <path
+              d="M3 12h3"
+            />
+            <path
+              d="M3 16h2"
+            />
+          </g>
+        </svg>
+      </div>
+      <div
+        class="dropdown-menu-item__text"
+      >
+        <span
+          style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"
+        >
+          Toggle rulers
+        </span>
+      </div>
+    </button>
     <div
       style="margin-top: 0.5rem;"
     >

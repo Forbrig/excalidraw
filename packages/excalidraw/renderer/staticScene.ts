@@ -42,6 +42,154 @@ const GridLineColor = {
   Regular: "#e5e5e5",
 } as const;
 
+const RulerColors = {
+  Background: "#f8f9fa",
+  Border: "#e9ecef",
+  Text: "#495057",
+  Tick: "#868e96",
+  MajorTick: "#343a40",
+} as const;
+
+const RULER_SIZE = 32;
+
+const strokeRulers = (
+  context: CanvasRenderingContext2D,
+  scrollX: number,
+  scrollY: number,
+  zoom: Zoom,
+  width: number,
+  height: number,
+) => {
+  const zoomValue = zoom.value;
+
+  // Calculate the measurement units based on zoom
+  let unit = 100; // base unit in pixels
+  let smallUnit = 10;
+  let labelUnit = 100;
+
+  // Adjust units based on zoom level
+  if (zoomValue < 0.1) {
+    unit = 1000;
+    smallUnit = 100;
+    labelUnit = 1000;
+  } else if (zoomValue < 0.5) {
+    unit = 200;
+    smallUnit = 50;
+    labelUnit = 200;
+  } else if (zoomValue < 1) {
+    unit = 100;
+    smallUnit = 25;
+    labelUnit = 100;
+  } else if (zoomValue > 4) {
+    unit = 25;
+    smallUnit = 5;
+    labelUnit = 50;
+  } else if (zoomValue > 2) {
+    unit = 50;
+    smallUnit = 10;
+    labelUnit = 100;
+  }
+
+  context.save();
+
+  // Draw horizontal ruler (top)
+  context.fillStyle = RulerColors.Background;
+  context.fillRect(0, 0, width, RULER_SIZE);
+
+  // Ruler border
+  context.strokeStyle = RulerColors.Border;
+  context.lineWidth = 1;
+  context.beginPath();
+  context.moveTo(0, RULER_SIZE);
+  context.lineTo(width, RULER_SIZE);
+  context.stroke();
+
+  // Horizontal ruler ticks and labels
+  const startX =
+    Math.floor((-scrollX - RULER_SIZE) / (unit * zoomValue)) * unit;
+  const endX =
+    startX + Math.ceil((width + RULER_SIZE * 2) / (unit * zoomValue)) * unit;
+
+  context.font = `10px Arial`;
+  context.textAlign = "center";
+  context.fillStyle = RulerColors.Text;
+
+  for (let x = startX; x <= endX; x += smallUnit) {
+    const screenX = x * zoomValue + scrollX;
+
+    if (screenX < 0 || screenX > width) {
+      continue;
+    }
+
+    const isMajor = x % unit === 0;
+    const isLabel = x % labelUnit === 0;
+
+    context.strokeStyle = isMajor ? RulerColors.MajorTick : RulerColors.Tick;
+    context.lineWidth = 1;
+    context.beginPath();
+    context.moveTo(screenX, RULER_SIZE);
+    context.lineTo(screenX, RULER_SIZE - (isMajor ? 8 : 4));
+    context.stroke();
+
+    if (isLabel && x !== 0) {
+      context.fillText(x.toString(), screenX, RULER_SIZE - 12);
+    }
+  }
+
+  // Draw vertical ruler (left)
+  context.fillStyle = RulerColors.Background;
+  context.fillRect(0, 0, RULER_SIZE, height);
+
+  // Ruler border
+  context.strokeStyle = RulerColors.Border;
+  context.beginPath();
+  context.moveTo(RULER_SIZE, 0);
+  context.lineTo(RULER_SIZE, height);
+  context.stroke();
+
+  // Vertical ruler ticks and labels
+  const startY =
+    Math.floor((-scrollY - RULER_SIZE) / (unit * zoomValue)) * unit;
+  const endY =
+    startY + Math.ceil((height + RULER_SIZE * 2) / (unit * zoomValue)) * unit;
+
+  context.textAlign = "center";
+
+  for (let y = startY; y <= endY; y += smallUnit) {
+    const screenY = y * zoomValue + scrollY;
+
+    if (screenY < 0 || screenY > height) {
+      continue;
+    }
+
+    const isMajor = y % unit === 0;
+    const isLabel = y % labelUnit === 0;
+
+    context.strokeStyle = isMajor ? RulerColors.MajorTick : RulerColors.Tick;
+    context.lineWidth = 1;
+    context.beginPath();
+    context.moveTo(RULER_SIZE, screenY);
+    context.lineTo(RULER_SIZE - (isMajor ? 8 : 4), screenY);
+    context.stroke();
+
+    if (isLabel && y !== 0) {
+      context.save();
+      context.translate(RULER_SIZE - 12, screenY);
+      context.rotate(-Math.PI / 2);
+      context.fillText(y.toString(), 0, 0);
+      context.restore();
+    }
+  }
+
+  // Draw corner square
+  context.fillStyle = RulerColors.Background;
+  context.fillRect(0, 0, RULER_SIZE, RULER_SIZE);
+  context.strokeStyle = RulerColors.Border;
+  context.strokeRect(0, 0, RULER_SIZE, RULER_SIZE);
+
+  context.restore();
+};
+
 const strokeGrid = (
   context: CanvasRenderingContext2D,
   /** grid cell pixel size */
@@ -257,6 +405,9 @@ const _renderStaticScene = ({
     );
   }
 
+  // Store context state for rulers later
+  const preZoomContext = context.getTransform();
+
   const groupsToBeAddedToFrame = new Set<string>();
 
   visibleElements.forEach((element) => {
@@ -458,6 +609,24 @@ const _renderStaticScene = ({
       console.error(error);
     }
   });
+
+  // Render rulers on top of everything (not affected by zoom)
+  if (appState.rulersEnabled && !isExporting) {
+    context.save();
+    context.setTransform(1, 0, 0, 1, 0, 0); // Reset transform
+    context.scale(scale, scale); // Apply device pixel ratio
+
+    strokeRulers(
+      context,
+      appState.scrollX,
+      appState.scrollY,
+      appState.zoom,
+      normalizedWidth,
+      normalizedHeight,
+    );
+
+    context.restore();
+  }
 };
 
 /** throttled to animation framerate */

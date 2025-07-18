@@ -58,6 +58,7 @@ import { ImageExportDialog } from "./ImageExportDialog";
 import { Island } from "./Island";
 import { JSONExportDialog } from "./JSONExportDialog";
 import { LaserPointerButton } from "./LaserPointerButton";
+import { RulerToggle } from "./RulerToggle";
 
 import "./LayerUI.scss";
 import "./Toolbar.scss";
@@ -354,6 +355,7 @@ const LayerUI = ({
               />
             )}
             {renderTopRightUI?.(device.editor.isMobile, appState)}
+            <RulerToggle />
             {!appState.viewModeEnabled &&
               appState.openDialog?.name !== "elementLinkSelector" &&
               // hide button when sidebar docked

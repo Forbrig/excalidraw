@@ -283,6 +283,7 @@ import {
   actionSendBackward,
   actionSendToBack,
   actionToggleGridMode,
+  actionToggleRulers,
   actionToggleStats,
   actionToggleZenMode,
   actionUnbindText,
@@ -657,6 +658,7 @@ class App extends React.Component<AppProps, AppState> {
       viewModeEnabled = false,
       zenModeEnabled = false,
       gridModeEnabled = false,
+      rulersEnabled = false,
       objectsSnapModeEnabled = false,
       theme = defaultAppState.theme,
       name = `${t("labels.untitled")}-${getDateTime()}`,
@@ -670,6 +672,7 @@ class App extends React.Component<AppProps, AppState> {
       zenModeEnabled,
       objectsSnapModeEnabled,
       gridModeEnabled: gridModeEnabled ?? defaultAppState.gridModeEnabled,
+      rulersEnabled: rulersEnabled ?? defaultAppState.rulersEnabled,
       name,
       width: window.innerWidth,
       height: window.innerHeight,
@@ -2845,8 +2848,14 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ zenModeEnabled: !!this.props.zenModeEnabled });
     }
 
+    if (prevProps.rulersEnabled !== this.props.rulersEnabled) {
+      this.setState({ rulersEnabled: !!this.props.rulersEnabled });
+    }
+
     if (prevProps.theme !== this.props.theme && this.props.theme) {
-      this.setState({ theme: this.props.theme });
+      this.setState({
+        theme: this.props.theme,
+      });
     }
 
     this.excalidrawContainerRef.current?.classList.toggle(

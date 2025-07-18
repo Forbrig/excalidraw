@@ -9,6 +9,7 @@ import {
   actionLoadScene,
   actionSaveToActiveFile,
   actionShortcuts,
+  actionToggleRulers,
   actionToggleSearchMenu,
   actionToggleTheme,
 } from "../../actions";
@@ -38,6 +39,7 @@ import {
   HelpIcon,
   LoadIcon,
   MoonIcon,
+  rulerIcon,
   save,
   searchIcon,
   SunIcon,
@@ -292,6 +294,27 @@ export const ToggleTheme = (
   );
 };
 ToggleTheme.displayName = "ToggleTheme";
+
+export const ToggleRulers = () => {
+  const { t } = useI18n();
+  const actionManager = useExcalidrawActionManager();
+
+  if (!actionManager.isActionEnabled(actionToggleRulers)) {
+    return null;
+  }
+
+  return (
+    <DropdownMenuItem
+      onSelect={() => actionManager.executeAction(actionToggleRulers)}
+      icon={rulerIcon}
+      data-testid="toggle-rulers"
+      aria-label={t("labels.toggleRulers")}
+    >
+      {t("labels.toggleRulers")}
+    </DropdownMenuItem>
+  );
+};
+ToggleRulers.displayName = "ToggleRulers";
 
 export const ChangeCanvasBackground = () => {
   const { t } = useI18n();
