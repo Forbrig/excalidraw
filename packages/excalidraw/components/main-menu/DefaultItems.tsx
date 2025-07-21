@@ -9,6 +9,8 @@ import {
   actionLoadScene,
   actionSaveToActiveFile,
   actionShortcuts,
+  actionToggleGridMode,
+  actionToggleGridSnap,
   actionToggleRulers,
   actionToggleSearchMenu,
   actionToggleTheme,
@@ -36,6 +38,7 @@ import {
   DeviceDesktopIcon,
   ExportIcon,
   ExportImageIcon,
+  gridIcon,
   HelpIcon,
   LoadIcon,
   MoonIcon,
@@ -315,6 +318,48 @@ export const ToggleRulers = () => {
   );
 };
 ToggleRulers.displayName = "ToggleRulers";
+
+export const ToggleGridSnap = () => {
+  const { t } = useI18n();
+  const actionManager = useExcalidrawActionManager();
+
+  if (!actionManager.isActionEnabled(actionToggleGridSnap)) {
+    return null;
+  }
+
+  return (
+    <DropdownMenuItem
+      onSelect={() => actionManager.executeAction(actionToggleGridSnap)}
+      icon={gridIcon}
+      data-testid="toggle-grid-snap"
+      aria-label={t("labels.toggleGridSnap")}
+    >
+      {t("labels.toggleGridSnap")}
+    </DropdownMenuItem>
+  );
+};
+ToggleGridSnap.displayName = "ToggleGridSnap";
+
+export const ToggleGrid = () => {
+  const { t } = useI18n();
+  const actionManager = useExcalidrawActionManager();
+
+  if (!actionManager.isActionEnabled(actionToggleGridMode)) {
+    return null;
+  }
+
+  return (
+    <DropdownMenuItem
+      onSelect={() => actionManager.executeAction(actionToggleGridMode)}
+      icon={gridIcon}
+      data-testid="toggle-grid"
+      aria-label={t("labels.toggleGrid")}
+    >
+      {t("labels.toggleGrid")}
+    </DropdownMenuItem>
+  );
+};
+ToggleGrid.displayName = "ToggleGrid";
 
 export const ChangeCanvasBackground = () => {
   const { t } = useI18n();

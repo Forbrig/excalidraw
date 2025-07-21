@@ -96,6 +96,7 @@
     "ungroup": "Ungroup selection",
     "collaborators": "Collaborators",
     "toggleGrid": "Toggle grid",
+    "toggleGridSnap": "Toggle grid snap",
     "toggleRulers": "Toggle rulers",
     "addToLibrary": "Add to library",
     "removeFromLibrary": "Remove from library",

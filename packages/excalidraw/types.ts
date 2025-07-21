@@ -386,6 +386,8 @@ export interface AppState {
   gridSize: number;
   gridStep: number;
   gridModeEnabled: boolean;
+  /** enable 10px grid snapping for elements */
+  gridSnapEnabled: boolean;
   /** ruler visibility and configuration */
   rulersEnabled: boolean;
   viewModeEnabled: boolean;
@@ -577,6 +579,7 @@ export interface ExcalidrawProps {
   viewModeEnabled?: boolean;
   zenModeEnabled?: boolean;
   gridModeEnabled?: boolean;
+  gridSnapEnabled?: boolean;
   rulersEnabled?: boolean;
   objectsSnapModeEnabled?: boolean;
   libraryReturnUrl?: string;

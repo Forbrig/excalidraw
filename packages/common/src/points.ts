@@ -78,3 +78,18 @@ export const getGridPoint = (
   }
   return [x, y];
 };
+
+export const getGridSnapPoint = (
+  x: number,
+  y: number,
+  enabled: boolean,
+  gridSize: number = 10,
+): [number, number] => {
+  if (enabled) {
+    return [
+      Math.round(x / gridSize) * gridSize,
+      Math.round(y / gridSize) * gridSize,
+    ];
+  }
+  return [x, y];
+};
