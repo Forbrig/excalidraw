@@ -283,6 +283,7 @@ import {
   actionSendBackward,
   actionSendToBack,
   actionToggleGridMode,
+  actionToggle10pxGridSnap,
   actionToggleStats,
   actionToggleZenMode,
   actionUnbindText,
@@ -371,6 +372,7 @@ import {
   getReferenceSnapPoints,
   SnapCache,
   isGridModeEnabled,
+  is10pxGridSnapEnabled,
 } from "../snapping";
 import { convertToExcalidrawElements } from "../data/transform";
 import { Renderer } from "../scene/Renderer";
@@ -405,6 +407,7 @@ import { activeEyeDropperAtom } from "./EyeDropper";
 import FollowMode from "./FollowMode/FollowMode";
 import LayerUI from "./LayerUI";
 import { ElementCanvasButton } from "./MagicButton";
+import Rulers from "./Rulers";
 import { SVGLayer } from "./SVGLayer";
 import { searchItemInFocusAtom } from "./SearchMenu";
 import { isSidebarDockedAtom } from "./Sidebar/Sidebar";
@@ -835,6 +838,9 @@ class App extends React.Component<AppProps, AppState> {
    * If disabled, returns null.
    */
   public getEffectiveGridSize = () => {
+    if (is10pxGridSnapEnabled(this)) {
+      return 10 as NullableGridSize;
+    }
     return (
       isGridModeEnabled(this) ? this.state.gridSize : null
     ) as NullableGridSize;
@@ -1750,13 +1756,16 @@ class App extends React.Component<AppProps, AppState> {
                           renderConfig={{
                             imageCache: this.imageCache,
                             isExporting: false,
-                            renderGrid: isGridModeEnabled(this),
+                            renderGrid:
+                              isGridModeEnabled(this) ||
+                              is10pxGridSnapEnabled(this),
                             canvasBackgroundColor:
                               this.state.viewBackgroundColor,
                             embedsValidationStatus: this.embedsValidationStatus,
                             elementsPendingErasure: this.elementsPendingErasure,
                             pendingFlowchartNodes:
                               this.flowChartCreator.pendingNodes,
+                            effectiveGridSize: this.getEffectiveGridSize(),
                           }}
                         />
                         {this.state.newElement && (
@@ -1770,6 +1779,7 @@ class App extends React.Component<AppProps, AppState> {
                               imageCache: this.imageCache,
                               isExporting: false,
                               renderGrid: false,
+                              effectiveGridSize: null,
                               canvasBackgroundColor:
                                 this.state.viewBackgroundColor,
                               embedsValidationStatus:
@@ -1808,6 +1818,11 @@ class App extends React.Component<AppProps, AppState> {
                           onTouchMove={this.handleTouchMove}
                           onPointerDown={this.handleCanvasPointerDown}
                           onDoubleClick={this.handleCanvasDoubleClick}
+                        />
+                        <Rulers
+                          appState={this.state}
+                          width={this.state.width}
+                          height={this.state.height}
                         />
                         {this.state.userToFollow && (
                           <FollowMode
@@ -10848,6 +10863,7 @@ class App extends React.Component<AppProps, AppState> {
         return [
           ...options,
           actionToggleGridMode,
+          actionToggle10pxGridSnap,
           actionToggleZenMode,
           actionToggleViewMode,
           actionToggleStats,
@@ -10865,6 +10881,7 @@ class App extends React.Component<AppProps, AppState> {
         actionUnlockAllElements,
         CONTEXT_MENU_SEPARATOR,
         actionToggleGridMode,
+        actionToggle10pxGridSnap,
         actionToggleObjectsSnapMode,
         actionToggleZenMode,
         actionToggleViewMode,
