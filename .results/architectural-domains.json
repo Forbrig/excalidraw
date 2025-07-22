@@ -1,0 +1,142 @@
+{
+  "ui": {
+    "required_patterns": {
+      "component-structure": "React functional components with TypeScript interfaces for props",
+      "styling": "CSS modules with .module.css pattern for component-specific styles",
+      "state-management": "Jotai atoms for global state, local useState for component state",
+      "canvas-rendering": "Canvas components extend InteractiveCanvas/StaticCanvas base classes"
+    },
+    "architectural_constraints": {
+      "component-organization": "Components must be organized by feature/domain in packages/excalidraw/components/",
+      "prop-interfaces": "All component props must have TypeScript interfaces defined",
+      "accessibility": "Components must include ARIA labels and accessibility attributes",
+      "theming": "Components must support both light and dark themes via CSS variables"
+    }
+  },
+  "canvas-rendering": {
+    "required_patterns": {
+      "canvas-abstraction": "Use StaticCanvas for non-interactive rendering, InteractiveCanvas for user interactions",
+      "roughjs-integration": "All shape rendering must use RoughJS library for hand-drawn aesthetic",
+      "coordinate-systems": "Use GlobalPoint/LocalPoint types from packages/math for coordinate transformations",
+      "rendering-pipeline": "Scene rendering through renderScene function with element batching"
+    },
+    "architectural_constraints": {
+      "performance": "Canvas operations must be optimized for large numbers of elements",
+      "coordinate-precision": "All coordinates must maintain precision through zoom/pan operations",
+      "export-compatibility": "Rendered elements must be exportable to SVG/PNG formats",
+      "collaboration-sync": "Canvas state must be serializable for real-time collaboration"
+    }
+  },
+  "state-management": {
+    "required_patterns": {
+      "jotai-atoms": "Use Jotai atoms for granular reactive state management",
+      "app-state": "Central appState atom contains all canvas and UI state",
+      "action-dispatching": "State mutations through action dispatchers following flux pattern",
+      "history-management": "Undo/redo through history atoms and state snapshots"
+    },
+    "architectural_constraints": {
+      "immutability": "All state updates must be immutable",
+      "serialization": "State must be JSON serializable for persistence and collaboration",
+      "performance": "State updates must be granular to avoid unnecessary re-renders",
+      "validation": "State mutations must validate data integrity"
+    }
+  },
+  "mathematical-utilities": {
+    "required_patterns": {
+      "point-system": "Use Point interface and related geometric utilities from packages/math",
+      "transformation-matrices": "Matrix operations for rotation, scaling, translation",
+      "collision-detection": "Hit testing and element intersection algorithms",
+      "curve-algorithms": "Bezier curves and smooth drawing calculations"
+    },
+    "architectural_constraints": {
+      "precision": "Mathematical operations must maintain floating-point precision",
+      "performance": "Algorithms must be optimized for real-time canvas interactions",
+      "coordinate-systems": "Must handle both global and local coordinate transformations",
+      "geometric-integrity": "Shape operations must preserve geometric relationships"
+    }
+  },
+  "element-system": {
+    "required_patterns": {
+      "element-interfaces": "All drawable elements implement ExcalidrawElement interface",
+      "element-types": "Specific element types (rectangle, ellipse, arrow, etc.) with type-specific properties",
+      "element-mutations": "Element updates through action dispatchers maintaining immutability",
+      "element-serialization": "Elements must be JSON serializable for export/import"
+    },
+    "architectural_constraints": {
+      "type-safety": "Element operations must maintain TypeScript type safety",
+      "backwards-compatibility": "Element schema must support version migration",
+      "performance": "Element operations must scale with large numbers of elements",
+      "collaboration": "Element changes must support operational transformation"
+    }
+  },
+  "actions-system": {
+    "required_patterns": {
+      "action-definitions": "Actions defined in packages/excalidraw/actions/ with standardized structure",
+      "action-registration": "Actions registered through actionManager with keyboard shortcuts",
+      "state-mutations": "Actions receive and return updated appState immutably",
+      "action-composition": "Complex operations composed of multiple atomic actions"
+    },
+    "architectural_constraints": {
+      "immutability": "Actions must not mutate input state directly",
+      "reversibility": "Actions must support undo/redo through history system",
+      "validation": "Actions must validate preconditions before execution",
+      "collaboration": "Actions must be serializable for real-time collaboration"
+    }
+  },
+  "collaboration": {
+    "required_patterns": {
+      "real-time-sync": "Socket.io for real-time collaboration with conflict resolution",
+      "operational-transform": "CRDT-like approach for merging concurrent edits",
+      "presence-awareness": "User cursor positions and selection states",
+      "conflict-resolution": "Last-writer-wins with operational transformation"
+    },
+    "architectural_constraints": {
+      "latency-tolerance": "System must handle network delays gracefully",
+      "offline-support": "Local changes must sync when connection restored",
+      "data-consistency": "Collaborative state must remain consistent across clients",
+      "scalability": "System must support multiple concurrent users"
+    }
+  },
+  "data-persistence": {
+    "required_patterns": {
+      "local-storage": "Browser localStorage for user preferences and recent files",
+      "export-formats": "JSON, PNG, SVG export through standardized export utilities",
+      "import-handling": "File import through drag-drop and file picker",
+      "library-persistence": "Component library stored in localStorage with sync"
+    },
+    "architectural_constraints": {
+      "format-compatibility": "Export formats must maintain cross-platform compatibility",
+      "version-migration": "File format must support schema evolution",
+      "size-optimization": "Exported files must be optimized for size",
+      "data-integrity": "Import/export must preserve element relationships"
+    }
+  },
+  "internationalization": {
+    "required_patterns": {
+      "i18next-integration": "i18next for translation management with namespaces",
+      "translation-keys": "Structured translation keys following domain hierarchy",
+      "rtl-support": "Right-to-left language support for UI layout",
+      "locale-detection": "Automatic locale detection with fallback to English"
+    },
+    "architectural_constraints": {
+      "translation-coverage": "All user-facing text must be translatable",
+      "pluralization": "Support for plural forms in different languages",
+      "context-awareness": "Translations must support contextual variations",
+      "performance": "Translation loading must not block UI rendering"
+    }
+  },
+  "testing": {
+    "required_patterns": {
+      "vitest-framework": "Vitest for unit and integration testing",
+      "react-testing": "@testing-library/react for component testing",
+      "test-organization": "Tests colocated with source files using .test.ts pattern",
+      "mock-utilities": "Shared mock utilities for common test scenarios"
+    },
+    "architectural_constraints": {
+      "test-coverage": "Critical paths must have comprehensive test coverage",
+      "test-isolation": "Tests must not depend on external state",
+      "performance": "Test suite must execute quickly for development workflow",
+      "maintainability": "Tests must be maintainable alongside code changes"
+    }
+  }
+}

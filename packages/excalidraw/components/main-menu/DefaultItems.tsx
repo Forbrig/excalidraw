@@ -9,6 +9,9 @@ import {
   actionLoadScene,
   actionSaveToActiveFile,
   actionShortcuts,
+  actionToggleGridMode,
+  actionToggleGridSnap,
+  actionToggleRulers,
   actionToggleSearchMenu,
   actionToggleTheme,
 } from "../../actions";
@@ -35,9 +38,11 @@ import {
   DeviceDesktopIcon,
   ExportIcon,
   ExportImageIcon,
+  gridIcon,
   HelpIcon,
   LoadIcon,
   MoonIcon,
+  rulerIcon,
   save,
   searchIcon,
   SunIcon,
@@ -292,6 +297,69 @@ export const ToggleTheme = (
   );
 };
 ToggleTheme.displayName = "ToggleTheme";
+
+export const ToggleRulers = () => {
+  const { t } = useI18n();
+  const actionManager = useExcalidrawActionManager();
+
+  if (!actionManager.isActionEnabled(actionToggleRulers)) {
+    return null;
+  }
+
+  return (
+    <DropdownMenuItem
+      onSelect={() => actionManager.executeAction(actionToggleRulers)}
+      icon={rulerIcon}
+      data-testid="toggle-rulers"
+      aria-label={t("labels.toggleRulers")}
+    >
+      {t("labels.toggleRulers")}
+    </DropdownMenuItem>
+  );
+};
+ToggleRulers.displayName = "ToggleRulers";
+
+export const ToggleGridSnap = () => {
+  const { t } = useI18n();
+  const actionManager = useExcalidrawActionManager();
+
+  if (!actionManager.isActionEnabled(actionToggleGridSnap)) {
+    return null;
+  }
+
+  return (
+    <DropdownMenuItem
+      onSelect={() => actionManager.executeAction(actionToggleGridSnap)}
+      icon={gridIcon}
+      data-testid="toggle-grid-snap"
+      aria-label={t("labels.toggleGridSnap")}
+    >
+      {t("labels.toggleGridSnap")}
+    </DropdownMenuItem>
+  );
+};
+ToggleGridSnap.displayName = "ToggleGridSnap";
+
+export const ToggleGrid = () => {
+  const { t } = useI18n();
+  const actionManager = useExcalidrawActionManager();
+
+  if (!actionManager.isActionEnabled(actionToggleGridMode)) {
+    return null;
+  }
+
+  return (
+    <DropdownMenuItem
+      onSelect={() => actionManager.executeAction(actionToggleGridMode)}
+      icon={gridIcon}
+      data-testid="toggle-grid"
+      aria-label={t("labels.toggleGrid")}
+    >
+      {t("labels.toggleGrid")}
+    </DropdownMenuItem>
+  );
+};
+ToggleGrid.displayName = "ToggleGrid";
 
 export const ChangeCanvasBackground = () => {
   const { t } = useI18n();

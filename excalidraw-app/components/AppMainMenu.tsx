@@ -86,6 +86,8 @@ export const AppMainMenu: React.FC<{
         <LanguageList style={{ width: "100%" }} />
       </MainMenu.ItemCustom>
       <MainMenu.DefaultItems.ChangeCanvasBackground />
+      <MainMenu.DefaultItems.ToggleGrid />
+      <MainMenu.DefaultItems.ToggleGridSnap />
     </MainMenu>
   );
 });

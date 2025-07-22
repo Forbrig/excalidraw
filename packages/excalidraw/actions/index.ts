@@ -80,6 +80,8 @@ export {
 } from "./actionClipboard";
 
 export { actionToggleGridMode } from "./actionToggleGridMode";
+export { actionToggleGridSnap } from "./actionToggleGridSnap";
+export { actionToggleRulers } from "./actionToggleRulers";
 export { actionToggleZenMode } from "./actionToggleZenMode";
 export { actionToggleObjectsSnapMode } from "./actionToggleObjectsSnapMode";
 

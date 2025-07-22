@@ -69,6 +69,7 @@ import {
   normalizeLink,
   toValidURL,
   getGridPoint,
+  getGridSnapPoint,
   getLineHeight,
   debounce,
   distance,
@@ -283,6 +284,8 @@ import {
   actionSendBackward,
   actionSendToBack,
   actionToggleGridMode,
+  actionToggleGridSnap,
+  actionToggleRulers,
   actionToggleStats,
   actionToggleZenMode,
   actionUnbindText,
@@ -657,6 +660,8 @@ class App extends React.Component<AppProps, AppState> {
       viewModeEnabled = false,
       zenModeEnabled = false,
       gridModeEnabled = false,
+      gridSnapEnabled = false,
+      rulersEnabled = false,
       objectsSnapModeEnabled = false,
       theme = defaultAppState.theme,
       name = `${t("labels.untitled")}-${getDateTime()}`,
@@ -670,6 +675,8 @@ class App extends React.Component<AppProps, AppState> {
       zenModeEnabled,
       objectsSnapModeEnabled,
       gridModeEnabled: gridModeEnabled ?? defaultAppState.gridModeEnabled,
+      gridSnapEnabled: gridSnapEnabled ?? defaultAppState.gridSnapEnabled,
+      rulersEnabled: rulersEnabled ?? defaultAppState.rulersEnabled,
       name,
       width: window.innerWidth,
       height: window.innerHeight,
@@ -838,6 +845,32 @@ class App extends React.Component<AppProps, AppState> {
     return (
       isGridModeEnabled(this) ? this.state.gridSize : null
     ) as NullableGridSize;
+  };
+
+  /**
+   * Returns the combined grid point considering both grid mode and grid snap.
+   * Respects zoom and pan by working in scene coordinates.
+   */
+  public getEffectiveGridPoint = (
+    x: number,
+    y: number,
+    event?: KeyboardModifiersObject | null,
+  ): [number, number] => {
+    // Skip grid snapping if Ctrl/Cmd is held
+    if (event?.[KEYS.CTRL_OR_CMD]) {
+      return [x, y];
+    }
+
+    // First apply regular grid if enabled
+    const gridSize = this.getEffectiveGridSize();
+    let [gridX, gridY] = getGridPoint(x, y, gridSize);
+
+    // Then apply 10px grid snap if enabled and regular grid is not active
+    if (this.state.gridSnapEnabled && !gridSize) {
+      [gridX, gridY] = getGridSnapPoint(gridX, gridY, true, 10);
+    }
+
+    return [gridX, gridY];
   };
 
   private getHTMLIFrameElement(
@@ -2845,8 +2878,14 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ zenModeEnabled: !!this.props.zenModeEnabled });
     }
 
+    if (prevProps.rulersEnabled !== this.props.rulersEnabled) {
+      this.setState({ rulersEnabled: !!this.props.rulersEnabled });
+    }
+
     if (prevProps.theme !== this.props.theme && this.props.theme) {
-      this.setState({ theme: this.props.theme });
+      this.setState({
+        theme: this.props.theme,
+      });
     }
 
     this.excalidrawContainerRef.current?.classList.toggle(
@@ -3221,7 +3260,7 @@ class App extends React.Component<AppProps, AppState> {
     const dx = x - elementsCenterX;
     const dy = y - elementsCenterY;
 
-    const [gridX, gridY] = getGridPoint(dx, dy, this.getEffectiveGridSize());
+    const [gridX, gridY] = this.getEffectiveGridPoint(dx, dy);
 
     const { duplicatedElements } = duplicateElements({
       type: "everything",
@@ -7550,12 +7589,10 @@ class App extends React.Component<AppProps, AppState> {
     width: number;
     height: number;
   }) => {
-    const [gridX, gridY] = getGridPoint(
+    const [gridX, gridY] = this.getEffectiveGridPoint(
       sceneX,
       sceneY,
-      this.lastPointerDownEvent?.[KEYS.CTRL_OR_CMD]
-        ? null
-        : this.getEffectiveGridSize(),
+      this.lastPointerDownEvent,
     );
 
     const element = newIframeElement({
@@ -7590,12 +7627,10 @@ class App extends React.Component<AppProps, AppState> {
     sceneY: number;
     link: string;
   }) => {
-    const [gridX, gridY] = getGridPoint(
+    const [gridX, gridY] = this.getEffectiveGridPoint(
       sceneX,
       sceneY,
-      this.lastPointerDownEvent?.[KEYS.CTRL_OR_CMD]
-        ? null
-        : this.getEffectiveGridSize(),
+      this.lastPointerDownEvent,
     );
 
     const embedLink = getEmbedLink(link);
@@ -7645,12 +7680,10 @@ class App extends React.Component<AppProps, AppState> {
     addToFrameUnderCursor?: boolean;
     imageFile: File;
   }) => {
-    const [gridX, gridY] = getGridPoint(
+    const [gridX, gridY] = this.getEffectiveGridPoint(
       sceneX,
       sceneY,
-      this.lastPointerDownEvent?.[KEYS.CTRL_OR_CMD]
-        ? null
-        : this.getEffectiveGridSize(),
+      this.lastPointerDownEvent,
     );
 
     const topLayerFrame = addToFrameUnderCursor
@@ -7878,12 +7911,10 @@ class App extends React.Component<AppProps, AppState> {
     elementType: ExcalidrawGenericElement["type"] | "embeddable",
     pointerDownState: PointerDownState,
   ): void => {
-    const [gridX, gridY] = getGridPoint(
+    const [gridX, gridY] = this.getEffectiveGridPoint(
       pointerDownState.origin.x,
       pointerDownState.origin.y,
-      this.lastPointerDownEvent?.[KEYS.CTRL_OR_CMD]
-        ? null
-        : this.getEffectiveGridSize(),
+      this.lastPointerDownEvent,
     );
 
     const topLayerFrame = this.getTopLayerFrameAtSceneCoords({
@@ -7936,12 +7967,10 @@ class App extends React.Component<AppProps, AppState> {
     pointerDownState: PointerDownState,
     type: Extract<ToolType, "frame" | "magicframe">,
   ): void => {
-    const [gridX, gridY] = getGridPoint(
+    const [gridX, gridY] = this.getEffectiveGridPoint(
       pointerDownState.origin.x,
       pointerDownState.origin.y,
-      this.lastPointerDownEvent?.[KEYS.CTRL_OR_CMD]
-        ? null
-        : this.getEffectiveGridSize(),
+      this.lastPointerDownEvent,
     );
 
     const constructorOpts = {
@@ -10518,10 +10547,10 @@ class App extends React.Component<AppProps, AppState> {
       return;
     }
 
-    let [gridX, gridY] = getGridPoint(
+    let [gridX, gridY] = this.getEffectiveGridPoint(
       pointerCoords.x,
       pointerCoords.y,
-      event[KEYS.CTRL_OR_CMD] ? null : this.getEffectiveGridSize(),
+      event,
     );
 
     const image =
@@ -10848,6 +10877,7 @@ class App extends React.Component<AppProps, AppState> {
         return [
           ...options,
           actionToggleGridMode,
+          actionToggleGridSnap,
           actionToggleZenMode,
           actionToggleViewMode,
           actionToggleStats,
